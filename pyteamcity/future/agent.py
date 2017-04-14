@@ -74,6 +74,15 @@ class Agent(object):
     def teamcity(self):
         return self.query_set.teamcity
 
+    def set_authorized(self, authorized_str, dry_run=False):
+        extra_headers = {'Content-Type': 'text/plain',
+                         'Accept': 'text/plain'}
+        req = self._put_request('authorized', data=authorized_str,
+                                extra_headers=extra_headers)
+        if dry_run:
+            return req
+        return self.teamcity.session.send(req)
+
     def set_enabled(self, enabled_str, dry_run=False):
         extra_headers = {'Content-Type': 'text/plain',
                          'Accept': 'text/plain'}
@@ -122,6 +131,12 @@ class Agent(object):
         if dry_run:
             return req
         return self.teamcity.session.send(req)
+
+    def authorize(self, dry_run=False):
+        return self.set_authorized('true', dry_run=dry_run)
+
+    def unauthorize(self, dry_run=False):
+        return self.set_authorized('false', dry_run=dry_run)
 
 
 class AgentQuerySet(QuerySet):

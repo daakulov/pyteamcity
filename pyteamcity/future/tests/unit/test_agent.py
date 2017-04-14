@@ -142,14 +142,14 @@ def test_unit_disable_enable():
 def test_unit_authorize_unauthorize():
     agent = get_agent_quick(id=34)
 
-    req = agent.authorize(dry_run=True)
+    req = agent.unauthorize(dry_run=True)
     assert req.method == 'PUT'
     assert req.headers['Content-Type'] == 'text/plain'
     assert req.headers['Accept'] == 'text/plain'
     assert req.body == 'false'
     assert req.url.endswith('/agents/id:34/authorized')
 
-    req = agent.enable(dry_run=True)
+    req = agent.authorize(dry_run=True)
     assert req.method == 'PUT'
     assert req.headers['Content-Type'] == 'text/plain'
     assert req.headers['Accept'] == 'text/plain'

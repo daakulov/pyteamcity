@@ -164,7 +164,7 @@ def test_unit_authorize_unauthorize():
         assert req.url.endswith('/agents/id:34/authorized')
 
         resp = agent.unauthorize()
-        assert resp.content == 'false'
+        assert resp.content == b'false'
         assert resp.status_code == 200
         assert resp.headers == {'Content-Type': 'text/plain'}
 
@@ -176,7 +176,7 @@ def test_unit_authorize_unauthorize():
         assert req.url.endswith('/agents/id:34/authorized')
 
         resp = agent.authorize()
-        assert resp.content == 'true'
+        assert resp.content == b'true'
         assert resp.status_code == 200
         assert resp.headers == {'Content-Type': 'text/plain'}
 

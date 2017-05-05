@@ -138,23 +138,47 @@ def test_unit_disable_enable():
     assert req.body == 'true'
     assert req.url.endswith('/agents/id:34/enabled')
 
-
+@responses.activate
 def test_unit_authorize_unauthorize():
-    agent = get_agent_quick(id=34)
+    with responses.RequestsMock(assert_all_requests_are_fired=True) as rsps:
+        rsps.add(
+            responses.PUT,
+            tc.relative_url('app/rest/agents/id:34/authorized'),
+            body='false', status=200,
+            content_type='text/plain',
+        )
+        rsps.add(
+            responses.PUT,
+            tc.relative_url('app/rest/agents/id:34/authorized'),
+            body='true', status=200,
+            content_type='text/plain',
+        )
 
-    req = agent.unauthorize(dry_run=True)
-    assert req.method == 'PUT'
-    assert req.headers['Content-Type'] == 'text/plain'
-    assert req.headers['Accept'] == 'text/plain'
-    assert req.body == 'false'
-    assert req.url.endswith('/agents/id:34/authorized')
+        agent = get_agent_quick(id=34)
 
-    req = agent.authorize(dry_run=True)
-    assert req.method == 'PUT'
-    assert req.headers['Content-Type'] == 'text/plain'
-    assert req.headers['Accept'] == 'text/plain'
-    assert req.body == 'true'
-    assert req.url.endswith('/agents/id:34/authorized')
+        req = agent.unauthorize(dry_run=True)
+        assert req.method == 'PUT'
+        assert req.headers['Content-Type'] == 'text/plain'
+        assert req.headers['Accept'] == 'text/plain'
+        assert req.body == 'false'
+        assert req.url.endswith('/agents/id:34/authorized')
+
+        resp = agent.unauthorize()
+        assert resp.content == 'false'
+        assert resp.status_code == 200
+        assert resp.headers == {'Content-Type': 'text/plain'}
+
+        req = agent.authorize(dry_run=True)
+        assert req.method == 'PUT'
+        assert req.headers['Content-Type'] == 'text/plain'
+        assert req.headers['Accept'] == 'text/plain'
+        assert req.body == 'true'
+        assert req.url.endswith('/agents/id:34/authorized')
+
+        resp = agent.authorize()
+        assert resp.content == 'true'
+        assert resp.status_code == 200
+        assert resp.headers == {'Content-Type': 'text/plain'}
 
 
 def test_unit_get_by_name():
